@@ -1,0 +1,21 @@
+package models
+
+import (
+	"time"
+)
+
+type Users struct {
+	UserID              string                `gorm:"column:user_id;primaryKey"`
+	FirebaseUID         string                `gorm:"column:firebase_uid"`
+	Email               string                `gorm:"column:email"`
+	Name                string                `gorm:"column:name"`
+	SimulationBalance   float64               `gorm:"column:simulation_balance"`
+	CreatedAt           time.Time             `gorm:"column:created_at"`
+	UpdatedAt           time.Time             `gorm:"column:updated_at"`
+	SimulationTrades    []SimulationTrades    `gorm:"foreignKey:UserID"`
+	SimulationPositions []SimulationPositions `gorm:"foreignKey:UserID"`
+}
+
+func (Users) TableName() string {
+	return "users"
+}
