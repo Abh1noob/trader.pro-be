@@ -5,7 +5,7 @@ import (
 )
 
 type SimulationPositions struct {
-	PositionID    string    `gorm:"column:position_id;primaryKey"`
+	ID            string    `gorm:"column:id;primaryKey"`
 	UserID        string    `gorm:"column:user_id"`
 	Symbol        string    `gorm:"column:symbol"`
 	Quantity      int       `gorm:"column:quantity"`

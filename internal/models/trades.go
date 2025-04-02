@@ -5,7 +5,7 @@ import (
 )
 
 type SimulationTrades struct {
-	TradeID     string    `gorm:"column:trade_id;primaryKey"`
+	ID          string    `gorm:"column:id;primaryKey"`
 	UserID      string    `gorm:"column:user_id"`
 	Symbol      string    `gorm:"column:symbol"`
 	TradeType   string    `gorm:"column:trade_type"`
