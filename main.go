@@ -4,27 +4,33 @@ import (
 	"log"
 
 	"github.com/Abh1noob/trader.pro-be/config"
+	"github.com/Abh1noob/trader.pro-be/internal/auth"
+	"github.com/Abh1noob/trader.pro-be/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	config.InitDB()
+	cfg, err := config.NewAppConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	app := fiber.New()
+	authRepo := auth.NewRepository(cfg.Auth, cfg.DB)
 
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS,PATCH",
-		AllowHeaders: "Origin, Content-Type, Accept",
-	}))
-
-	app.Get("/ping", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"message": "Pong", "status": 200})
+	app := fiber.New(fiber.Config{
+		ReadBufferSize: 1024 * 10, // Increase buffer size (10 KB)
 	})
 
-	log.Println("Starting server on :80...")
-	if err := app.Listen(":80"); err != nil {
-		log.Fatal("Failed to start server:", err)
-	}
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000,https://yourproductiondomain.com",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+		AllowCredentials: true,
+	}))
+
+	routes.RegisterAuthRoutes(app, authRepo)
+
+	log.Println("Server running on http://localhost:8080")
+	log.Fatal(app.Listen(":8080"))
 }
