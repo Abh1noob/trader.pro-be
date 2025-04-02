@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 
+	firebase "firebase.google.com/go"
 	"github.com/Abh1noob/trader.pro-be/config"
 	"github.com/Abh1noob/trader.pro-be/internal/auth"
+	"github.com/Abh1noob/trader.pro-be/middlewares"
 	"github.com/Abh1noob/trader.pro-be/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"google.golang.org/api/option"
 )
 
 func main() {
@@ -18,8 +22,14 @@ func main() {
 
 	authRepo := auth.NewRepository(cfg.Auth, cfg.DB)
 
+	opt := option.WithCredentialsFile("firebase-key.json")
+	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		log.Fatalf("Firebase initialization error: %v", err)
+	}
+
 	app := fiber.New(fiber.Config{
-		ReadBufferSize: 1024 * 10, // Increase buffer size (10 KB)
+		ReadBufferSize: 1024 * 10,
 	})
 
 	app.Use(cors.New(cors.Config{
@@ -29,7 +39,13 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	app.Use(middlewares.FirebaseAuthMiddleware(firebaseApp))
+
 	routes.RegisterAuthRoutes(app, authRepo)
+
+	app.Get("/public/hello", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"message": "This is a public route"})
+	})
 
 	log.Println("Server running on http://localhost:8080")
 	log.Fatal(app.Listen(":8080"))

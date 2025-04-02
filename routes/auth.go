@@ -7,5 +7,7 @@ import (
 )
 
 func RegisterAuthRoutes(app *fiber.App, authRepo *auth.Repository) {
-	app.Post("/api/v1/auth/login", api.LoginHandler(authRepo))
+
+	authGroup := app.Group("/api/v1/auth")
+	authGroup.Post("/login", api.LoginHandler(authRepo))
 }

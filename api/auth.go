@@ -1,7 +1,6 @@
 package api
 
 import (
-	"strings"
 	"time"
 
 	"github.com/Abh1noob/trader.pro-be/internal/auth"
@@ -10,18 +9,23 @@ import (
 
 func LoginHandler(authRepo *auth.Repository) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		token := c.Get("Authorization")
-		if token == "" || !strings.HasPrefix(token, "Bearer ") {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "missing or invalid Authorization header"})
+
+		uid := c.Locals("uid")
+		email := c.Locals("email")
+		name := c.Locals("name")
+
+		if uid == nil || email == nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
 		}
 
-		idToken := strings.TrimPrefix(token, "Bearer ")
-		uid, email, name, err := authRepo.VerifyFirebaseToken(idToken)
-		if err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid token"})
+		uidStr := uid.(string)
+		emailStr := email.(string)
+		nameStr := ""
+		if name != nil {
+			nameStr = name.(string)
 		}
 
-		exists, err := authRepo.DoesUserExist(uid)
+		exists, err := authRepo.DoesUserExist(uidStr)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error":   "failed to check user existence",
@@ -30,7 +34,7 @@ func LoginHandler(authRepo *auth.Repository) fiber.Handler {
 		}
 
 		if !exists {
-			if err := authRepo.StoreUser(uid, email, name); err != nil {
+			if err := authRepo.StoreUser(uidStr, emailStr, nameStr); err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"error":   "failed to store user",
 					"details": err.Error(),
@@ -40,7 +44,7 @@ func LoginHandler(authRepo *auth.Repository) fiber.Handler {
 
 		c.Cookie(&fiber.Cookie{
 			Name:     "auth_token",
-			Value:    idToken,
+			Value:    c.Get("Authorization"),
 			Expires:  time.Now().Add(24 * time.Hour),
 			HTTPOnly: true,
 			Secure:   true,
@@ -49,8 +53,8 @@ func LoginHandler(authRepo *auth.Repository) fiber.Handler {
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "Logged in successfully",
-			"uid":     uid,
-			"email":   email,
+			"uid":     uidStr,
+			"email":   emailStr,
 		})
 	}
 }
