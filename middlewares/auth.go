@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
@@ -15,15 +16,17 @@ func FirebaseAuthMiddleware(app *firebase.App) fiber.Handler {
 		if strings.HasPrefix(c.Path(), "/public/") {
 			return c.Next()
 		}
-
 		authHeader := c.Get("Authorization")
-		if authHeader == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing Authorization header"})
+		var tokenString string
+
+		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
+			tokenString = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			tokenString = c.Cookies("auth_token")
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid Authorization header format"})
+		if tokenString == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing Authorization header or auth_token cookie"})
 		}
 
 		client, err := app.Auth(context.Background())
@@ -32,7 +35,9 @@ func FirebaseAuthMiddleware(app *firebase.App) fiber.Handler {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Auth client error"})
 		}
 
-		token, err := client.VerifyIDToken(context.Background(), tokenString)
+		fmt.Print("Token String: ", strings.Split(tokenString, "Bearer ")[1])
+
+		token, err := client.VerifyIDToken(context.Background(), strings.Split(tokenString, "Bearer ")[1])
 		if err != nil {
 			log.Println("Invalid Firebase token:", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})

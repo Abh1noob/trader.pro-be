@@ -25,21 +25,18 @@ func (h *SimulationHandler) CreateTrade(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	// 🔹 Extract Firebase UID from middleware
 	firebaseUID := c.Locals("uid").(string)
 
-	// 🔹 Find the correct user ID
 	var user models.User
 	if err := h.DB.Where("firebase_uid = ?", firebaseUID).First(&user).Error; err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "User not found"})
 	}
 
-	// 🔹 Store the actual User ID (UUID) in the trade
 	trade.UserID = user.ID
 
-	// 🔹 Insert trade into database
 	if err := h.Repo.CreateTrade(h.DB, &trade); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create trade"})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"error": "Failed to create trade"})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(trade)
@@ -56,13 +53,14 @@ func (h *SimulationHandler) GetTradeByID(c *fiber.Ctx) error {
 }
 
 func (h *SimulationHandler) ListTradesByUser(c *fiber.Ctx) error {
-	userID := c.Locals("uid").(string) // Extract user ID from middleware
+	userID := c.Locals("uid").(string)
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
 
 	trades, err := h.Repo.ListTradesByUser(h.DB, userID, limit, offset)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve trades"})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"error": "Failed to retrieve trades"})
 	}
 
 	return c.JSON(trades)
