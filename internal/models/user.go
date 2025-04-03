@@ -14,8 +14,8 @@ type User struct {
 	SimulationBalance   float64               `gorm:"column:simulation_balance"`
 	CreatedAt           time.Time             `gorm:"column:created_at"`
 	UpdatedAt           time.Time             `gorm:"column:updated_at"`
-	SimulationTrades    []SimulationTrades    `gorm:"foreignKey:UserID"`
-	SimulationPositions []SimulationPositions `gorm:"foreignKey:UserID"`
+	SimulationTrades    []SimulationTrades    `gorm:"foreignKey:UserID;references:ID"`
+	SimulationPositions []SimulationPositions `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (User) TableName() string {
