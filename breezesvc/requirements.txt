@@ -1,0 +1,6 @@
+breeze-connect
+Flask
+gunicorn
+pandas
+pymongo
+python-dotenv
