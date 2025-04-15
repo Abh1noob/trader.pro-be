@@ -4,3 +4,4 @@ gunicorn
 pandas
 pymongo
 python-dotenv
+flask_cors
