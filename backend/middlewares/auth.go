@@ -26,21 +26,24 @@ func FirebaseAuthMiddleware(app *firebase.App) fiber.Handler {
 		}
 
 		if tokenString == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing Authorization header or auth_token cookie"})
+			return c.Status(fiber.StatusUnauthorized).
+				JSON(fiber.Map{"error": "Missing Authorization header or auth_token cookie"})
 		}
 
 		client, err := app.Auth(context.Background())
 		if err != nil {
 			log.Println("Error getting Firebase Auth client:", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Auth client error"})
+			return c.Status(fiber.StatusInternalServerError).
+				JSON(fiber.Map{"error": "Auth client error"})
 		}
 
-		fmt.Print("Token String: ", strings.Split(tokenString, "Bearer ")[1])
+		fmt.Println("Token String:", tokenString)
 
-		token, err := client.VerifyIDToken(context.Background(), strings.Split(tokenString, "Bearer ")[1])
+		token, err := client.VerifyIDToken(context.Background(), tokenString)
 		if err != nil {
 			log.Println("Invalid Firebase token:", err)
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
+			return c.Status(fiber.StatusUnauthorized).
+				JSON(fiber.Map{"error": "Invalid or expired token"})
 		}
 
 		c.Locals("uid", token.UID)

@@ -2,11 +2,13 @@ package models
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type SimulationPositions struct {
-	ID            string    `gorm:"column:id;primaryKey"`
-	UserID        string    `gorm:"column:user_id"`
+	ID            uuid.UUID `gorm:"column:id;primaryKey"`
+	UserID        uuid.UUID `gorm:"column:user_id"`
 	Symbol        string    `gorm:"column:symbol"`
 	Quantity      int       `gorm:"column:quantity"`
 	AvgPrice      float64   `gorm:"column:avg_price"`
