@@ -7,6 +7,11 @@ import os
 
 load_dotenv()
 
+print("Environment Variables:")
+print(os.getenv("BREEZE_API_KEY"))
+print(os.getenv("BREEZE_SECRET_KEY"))
+print(os.getenv("BREEZE_SESSION_TOKEN"))
+
 app = FastAPI()
 
 app.add_middleware(

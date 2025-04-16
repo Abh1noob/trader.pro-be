@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - breezesvc
+
+  breezesvc:
+    build: ./breezesvc
+    ports:
+      - "5000:5000"
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - breezesvc
