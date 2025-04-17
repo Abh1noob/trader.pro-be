@@ -1,22 +1,35 @@
-version: "3.8"
-
+version: "3"
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend # Adjust this to the correct path for your backend Dockerfile
+      dockerfile: Dockerfile # If your Dockerfile is named 'Dockerfile' in the 'backend' folder
     ports:
       - "8080:8080"
-    depends_on:
-      - breezesvc
+    networks:
+      - app-network
 
-  breezesvc:
-    build: ./breezesvc
+  breeze:
+    build:
+      context: ./breeze # Adjust this to the correct path for your breeze Dockerfile
+      dockerfile: Dockerfile # If your Dockerfile is named 'Dockerfile' in the 'breeze' folder
     ports:
       - "5000:5000"
+    networks:
+      - app-network
 
   nginx:
-    build: ./nginx
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf # Mount your nginx.conf file
     ports:
       - "80:80"
+    networks:
+      - app-network
     depends_on:
       - backend
-      - breezesvc
+      - breeze
+
+networks:
+  app-network:
+    driver: bridge

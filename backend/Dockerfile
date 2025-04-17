@@ -1,33 +1,17 @@
-# Use Go Alpine image as base
-FROM golang:1.20-alpine as builder
+FROM golang:1.23-alpine
 
-# Set up the working directory
 WORKDIR /app
 
-# Copy Go module files and download dependencies
+# Copy and install Go modules
 COPY go.mod go.sum ./
-RUN go mod tidy
+RUN go mod download
 
-# Copy the source code into the container
+# Copy the whole app
 COPY . .
 
-# Build the Go application
-RUN go build -o /app/backend .
+# Build
+RUN go build -o main .
 
-# Start a new stage from the Alpine image to keep the final image lightweight
-FROM alpine:latest
-
-# Install necessary dependencies for running Go applications
-RUN apk --no-cache add ca-certificates
-
-# Set the working directory
-WORKDIR /root/
-
-# Copy the compiled Go binary from the builder stage
-COPY --from=builder /app/backend .
-
-# Expose the port on which your app will run
 EXPOSE 8080
 
-# Run the Go application
-CMD ["./backend"]
+CMD ["./main"]
