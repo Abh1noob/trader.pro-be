@@ -1,16 +1,19 @@
 # Project settings
-PROJECT_NAME=trader.pro-be
-COMPOSE=docker-compose
-DOCKER_RUN=docker compose run --rm
+PROJECT_NAME = trader.pro-be
+COMPOSE = docker-compose
+DOCKER_RUN = docker compose run --rm
 
 # Services
-BACKEND_SERVICE=backend
-BREEZESVC_SERVICE=breezesvc
-NGINX_SERVICE=nginx
+BACKEND_SERVICE = backend
+BREEZESVC_SERVICE = breezesvc
+NGINX_SERVICE = nginx
 
 # Targets
 
 .PHONY: all build up down restart logs backend breeze test deploy
+
+## Default target (build, up)
+all: build up
 
 ## Build all services
 build:
@@ -27,7 +30,7 @@ down:
 ## Restart all services
 restart: down up
 
-## Show logs
+## Show logs for all services
 logs:
 	$(COMPOSE) logs -f
 

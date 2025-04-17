@@ -48,7 +48,7 @@ func LoginHandler(authRepo *auth.Repository) fiber.Handler {
 			Expires:  time.Now().Add(24 * time.Hour),
 			HTTPOnly: true,
 			Secure:   true,
-			SameSite: "Lax",
+			SameSite: "None",
 		})
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{

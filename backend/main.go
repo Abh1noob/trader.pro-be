@@ -33,11 +33,12 @@ func main() {
 	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,https://yourproductiondomain.com",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-		AllowCredentials: true,
+    		AllowOrigins:     "http://localhost:3000, https://trader.pro-fe.abhinavganeshan.in",
+    		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+    		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+    		AllowCredentials: true,
 	}))
+	
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"message": "hello"})
