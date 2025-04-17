@@ -8,7 +8,6 @@ import (
 	"github.com/Abh1noob/trader.pro-be/api"
 	"github.com/Abh1noob/trader.pro-be/config"
 	"github.com/Abh1noob/trader.pro-be/internal/auth"
-	"github.com/Abh1noob/trader.pro-be/internal/positions"
 	"github.com/Abh1noob/trader.pro-be/middlewares"
 	"github.com/Abh1noob/trader.pro-be/routes"
 	"github.com/gofiber/fiber/v2"
@@ -50,11 +49,6 @@ func main() {
 
 	SimulationHandler := api.NewSimulationHandler(cfg.DB.DB)
 	routes.MountSimulationRoutes(app, SimulationHandler)
-
-	positionRepo := positions.NewPositionRepo()
-	positionHandler := api.NewPositionHandler(cfg.DB.DB, positionRepo)
-
-	routes.MountPositionRoutes(app, positionHandler)
 
 	log.Println("Server running on http://localhost:8080")
 

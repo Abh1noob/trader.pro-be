@@ -21,9 +21,5 @@ func main() {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
-	if err := cfg.DB.AutoMigrate(&models.SimulationPositions{}); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
-	}
-
 	log.Println("Database migration completed!")
 }
