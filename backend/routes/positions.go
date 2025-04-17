@@ -6,7 +6,7 @@ import (
 )
 
 func MountPositionRoutes(app *fiber.App, handler *api.PositionHandler) {
-	posRoute := app.Group("/api/positions")
+	posRoute := app.Group("/api/v1/positions")
 	posRoute.Get("/", handler.ListPositions)
 	posRoute.Get("/:id", handler.GetPositionByID)
 	posRoute.Post("/", handler.CreatePosition)

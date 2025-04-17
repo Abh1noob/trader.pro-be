@@ -8,7 +8,7 @@ import (
 
 func MountSimulationRoutes(app *fiber.App, handler *api.SimulationHandler) {
 
-	simRoute := app.Group("/api/simulation")
+	simRoute := app.Group("/api/v1/simulation")
 	simRoute.Post("/trade", handler.CreateTrade)
 	simRoute.Get("/trade/:id", handler.GetTradeByID)
 	simRoute.Get("/trades", handler.ListTradesByUser)

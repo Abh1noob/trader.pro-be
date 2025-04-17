@@ -12,18 +12,28 @@ import (
 
 func FirebaseAuthMiddleware(app *firebase.App) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-
+		// Skip middleware for public routes and login endpoint
 		if strings.HasPrefix(c.Path(), "/public/") {
 			return c.Next()
 		}
-		authHeader := c.Get("Authorization")
+
 		var tokenString string
 
+		// Try to get token from Authorization header first
+		authHeader := c.Get("Authorization")
+		fmt.Print("Auth Header:", authHeader)
 		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
 			tokenString = strings.TrimPrefix(authHeader, "Bearer ")
 		} else {
+			// If not in header, try to get from cookie
 			tokenString = c.Cookies("auth_token")
+			// Remove Bearer prefix if present in cookie
+			if strings.HasPrefix(tokenString, "Bearer ") {
+				tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+			}
 		}
+
+		fmt.Println("Auth Token:", tokenString)
 
 		if tokenString == "" {
 			return c.Status(fiber.StatusUnauthorized).
@@ -36,8 +46,6 @@ func FirebaseAuthMiddleware(app *firebase.App) fiber.Handler {
 			return c.Status(fiber.StatusInternalServerError).
 				JSON(fiber.Map{"error": "Auth client error"})
 		}
-
-		fmt.Println("Token String:", tokenString)
 
 		token, err := client.VerifyIDToken(context.Background(), tokenString)
 		if err != nil {
