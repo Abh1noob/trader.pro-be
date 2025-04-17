@@ -36,7 +36,6 @@ func (h *SimulationHandler) CreateTrade(c *fiber.Ctx) error {
 	trade.UserID = user.ID
 	trade.TotalAmount = float64(trade.Quantity) * trade.Price
 	trade.Timestamp = time.Now()
-	trade.ExecutedAt = time.Now()
 
 	if err := h.Repo.CreateTrade(h.DB, &trade); err != nil {
 		return c.Status(fiber.StatusInternalServerError).
